@@ -28,5 +28,9 @@ public interface GameService {
 
     Map<Suit, Integer> getRemainingBySuit(Game game);
     Map<Card, Integer> getRemainingCards(Game game);
+
+    Optional<Player> deletePlayer(Game g, String playerId);
+
+    Optional<Player> fetchPlayer(Game g, String playerId);
 }
 

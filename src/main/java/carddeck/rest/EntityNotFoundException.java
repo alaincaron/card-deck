@@ -1,5 +1,7 @@
 package carddeck.rest;
 
+import java.util.function.Supplier;
+
 public class EntityNotFoundException extends RuntimeException {
     private final String entity;
     private final String id;

@@ -8,6 +8,7 @@ import carddeck.model.Player;
 import carddeck.model.Score;
 import carddeck.model.Suit;
 import carddeck.rest.EntityNotFoundException;
+import carddeck.rest.EntityNotFoundExceptionSuppliers;
 import carddeck.services.GameDeckService;
 import carddeck.services.GameService;
 import carddeck.services.PlayerService;
@@ -77,11 +78,21 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
+    public Optional<Player> deletePlayer(Game g, String playerId) {
+        return Optional.ofNullable(g.getPlayerMap().remove(playerId));
+    }
+
+    @Override
+    public Optional<Player> fetchPlayer(Game g, String playerId) {
+        return Optional.ofNullable(g.getPlayerMap().get(playerId));
+    }
+
+    @Override
     public Player dealCards(Game game, String playerId, int nbCards) {
         final Player player =
             playerService
                 .fetch(playerId)
-                .orElseThrow(() -> new EntityNotFoundException("Player", playerId));
+                .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId));
 
         final GameDeck gameDeck = getGameDeck(game);
         final Collection<Card> cards = gameDeck.dealCards(nbCards);
@@ -140,8 +151,7 @@ class GameServiceImpl implements GameService {
         if (c != 0) {
             return c;
         }
-        return card2.getRank().compareTo(card1
-                                             .getRank());
+        return card2.getRank().compareTo(card1.getRank());
     };
 
     private GameDeck getGameDeck(Game game) {

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,31 +32,31 @@ public class GameController {
     }
 
     @PostMapping
-    Game createGame() {
+    public Game createGame() {
         return gameService.createGame();
     }
 
     @GetMapping
-    Collection<Game> listGames() {
+    public Collection<Game> listGames() {
         return gameService.listGames();
     }
 
     @GetMapping("/{id}")
-    Game fetchGame(@PathVariable String id) {
+    public Game fetchGame(@PathVariable String id) {
         return gameService
             .fetchGame(id)
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @DeleteMapping("/{id}")
-    void deleteGame(@PathVariable String id) {
-         gameService
+    public void deleteGame(@PathVariable String id) {
+        gameService
              .deleteGame(id)
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @PutMapping("/{id}/addDeck")
-    Game addDeck(
+    public Game addDeck(
         @PathVariable String id,
         @RequestParam(defaultValue = "1") int nbDecks)
     {
@@ -70,69 +69,103 @@ public class GameController {
         return gameService
             .fetchGame(id)
             .map(g -> gameService.addDecks(g, nbDecks))
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+    }
+
+    // Players related operations
+
+    @GetMapping("/{id}/players")
+    public Collection<String> getPlayers(@PathVariable String id) {
+        return gameService
+                .fetchGame(id)
+                .map(g -> g.getPlayerMap().keySet())
+                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @PostMapping("/{id}/players")
-    Player addPlayer(@PathVariable String id) {
-      return gameService
+    public Player addPlayer(@PathVariable String id) {
+        return gameService
           .fetchGame(id)
           .map(gameService::addPlayer)
-          .orElseThrow(notFound(id));
+          .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
-    @PutMapping("/{id}/deal/{playerId}")
-    Player dealToPlayer(
+    @GetMapping("{id}/players/{playerId}")
+    public Player showPlayer(
+            @PathVariable("id") String id,
+            @PathVariable("playerId") String playerId) {
+
+        return gameService
+                .fetchGame(id)
+                .map(g -> gameService
+                        .fetchPlayer(g, playerId)
+                        .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId))
+                )
+                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+    }
+
+
+    @DeleteMapping("{id}/players/{playerId}")
+    public void removePlayer(
         @PathVariable("id") String id,
-        @PathVariable("playerId") String playerId,
-        @RequestParam(value = "nbCards", defaultValue = "1") int nbCards)  {
+        @PathVariable("playerId") String playerId) {
+        gameService
+                .fetchGame(id)
+                .map(g -> gameService
+                        .deletePlayer(g, playerId)
+                        .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId))
+                )
+                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+    }
+
+    @PutMapping("/{id}/players/{playerId}/deal")
+    public Player dealToPlayer(
+            @PathVariable("id") String id,
+            @PathVariable("playerId") String playerId,
+            @RequestParam(value = "nbCards", defaultValue = "1") int nbCards)  {
         if (nbCards <= 0) {
             throw new IllegalArgumentException("Invalid value for nbCards");
         }
         return gameService
-            .fetchGame(id)
-            .map(g -> gameService.dealCards(g, playerId, nbCards))
-            .orElseThrow(notFound(id));
+                .fetchGame(id)
+                .map(g -> gameService.dealCards(g, playerId, nbCards))
+                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
-    @DeleteMapping("{id}/player/{playerId}")
-    void removePlayer(
-        @PathVariable("id") String id,
-        @PathVariable("playerId") String playerId) {
-        throw new IllegalArgumentException();
-    }
+    // Misc games operations
 
     @PutMapping("/{id}/shuffle")
-    void shuffle(@PathVariable String id) {
-        final Game game = gameService.fetchGame(id).orElseThrow(notFound(id));
+    public void shuffle(@PathVariable String id) {
+        final Game game = gameService.fetchGame(id).orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
         gameService.shuffle(game);
     }
 
     @GetMapping("/{id}/scores")
-    List<Score> getScores(@PathVariable String id) {
+    public List<Score> getScores(@PathVariable String id) {
         return gameService
             .fetchGame(id)
             .map(gameService::getScores)
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @GetMapping("/{id}/count_suits")
-    Map<Suit, Integer> getCountBySuit(@PathVariable String id) {
+    public Map<Suit, Integer> getCountBySuit(@PathVariable String id) {
         return gameService
             .fetchGame(id)
             .map(gameService::getRemainingBySuit)
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @GetMapping("/{id}/count_cards")
-    List<Map<String, Object>> getCountByCard(@PathVariable String id) {
+    public List<Map<String, Object>> getCountByCard(@PathVariable String id) {
         return gameService
             .fetchGame(id)
             .map(gameService::getRemainingCards)
             .map(this::toList)
-            .orElseThrow(notFound(id));
+            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
+    // Helper functions
     private List<Map<String, Object>> toList(Map<Card, Integer> map) {
         return map.entrySet()
                   .stream()
@@ -140,7 +173,4 @@ public class GameController {
             .collect(Collectors.toList());
     }
 
-    private static Supplier<EntityNotFoundException> notFound(String id) {
-        return () -> new EntityNotFoundException("Game", id);
-    }
 }
