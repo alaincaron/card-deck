@@ -7,19 +7,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class GameImpl implements Game {
+class GameImpl implements Game, Serializable {
     private final String id;
 
     @JsonIgnore
     private final Map<String, Player> playerMap = Maps.newConcurrentMap();
 
     @JsonIgnore
-    private GameDeck gameDeck;
+    private final GameDeck gameDeck = new GameDeckImpl();
 
     public GameImpl(String id) {
         this.id = id;
@@ -32,7 +32,7 @@ class GameImpl implements Game {
 
     @Override
     public Map<String, Player> getPlayerMap() {
-        return Collections.unmodifiableMap(playerMap);
+        return playerMap;
     }
 
     @Override
@@ -51,11 +51,6 @@ class GameImpl implements Game {
     }
 
     @Override
-    public void setGameDeck(GameDeck gameDeck) {
-        this.gameDeck = gameDeck;
-    }
-
-    @Override
     public GameDeck getGameDeck() {
         return gameDeck;
     }
@@ -70,7 +65,7 @@ class GameImpl implements Game {
     }
 
     @JsonProperty
-    public int nbRemaining() {
+    public int getNbRemaining() {
         return gameDeck == null ? 0 : gameDeck.nbRemainingCards();
     }
 

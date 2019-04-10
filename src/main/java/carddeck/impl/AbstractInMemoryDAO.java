@@ -9,18 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-abstract class AbstractInMemoryDAO<T extends WithId> implements GenericDAO<T> {
+class AbstractInMemoryDAO<T extends WithId> extends AbstractFactory<T> implements GenericDAO<T> {
     private final Map<String, T> allInstances = new ConcurrentHashMap<>();
-    private final IdGenerator idGenerator = new IdGenerator();
-    private final Function<String, T> creator;
 
-    protected AbstractInMemoryDAO(Function<String, T> creator) {
-        this.creator = creator;
+    AbstractInMemoryDAO(Function<String, T> creator) {
+        super(creator);
     }
     @Override
     public T create() {
-        final String id = idGenerator.generate();
-        final T instance = creator.apply(id);
+        final T instance = super.create();
         allInstances.put(instance.getId(), instance);
         return instance;
     }

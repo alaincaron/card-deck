@@ -7,6 +7,7 @@ import carddeck.model.Suit;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,19 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-class GameDeckImpl implements GameDeck {
+class GameDeckImpl implements GameDeck, Serializable {
     private static final int DECK_SIZE = Suit.values().length * Rank.values().length;
     private final List<Card> deck = Lists.newArrayListWithCapacity(DECK_SIZE * 3);
-    private final String id;
-
-    GameDeckImpl(String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
 
     private int nbDecks = 0;
 

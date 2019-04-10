@@ -1,13 +1,12 @@
 package carddeck.impl;
 
-import carddeck.dao.PlayerDAO;
+import carddeck.dao.PlayerFactory;
 import carddeck.model.Player;
 import org.springframework.stereotype.Component;
 
 @Component
-class InMemoryPlayerDAOImpl extends AbstractInMemoryDAO<Player> implements PlayerDAO {
-
-    InMemoryPlayerDAOImpl() {
+class PlayerFactoryImpl extends AbstractFactory<Player> implements PlayerFactory {
+    PlayerFactoryImpl() {
         super(PlayerImpl::new);
     }
 }

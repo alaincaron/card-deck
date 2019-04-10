@@ -4,9 +4,10 @@ import carddeck.model.Card;
 import carddeck.model.Player;
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.Collection;
 
-class PlayerImpl implements Player {
+class PlayerImpl implements Player, Serializable {
 
     private final String id;
     private final Collection<Card> cards = Lists.newLinkedList();

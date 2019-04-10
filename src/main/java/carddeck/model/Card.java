@@ -28,6 +28,10 @@ public class Card {
         this.suit = suit;
     }
 
+    public static Card getCard(Rank rank, Suit suit) {
+        return ALL_CARDS[rank.ordinal() * Suit.values().length + suit.ordinal()];
+    }
+
     public final Rank getRank() {
         return rank;
     }

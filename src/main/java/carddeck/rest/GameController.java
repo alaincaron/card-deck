@@ -6,6 +6,7 @@ import carddeck.model.Player;
 import carddeck.model.Score;
 import carddeck.model.Suit;
 import carddeck.services.GameService;
+import carddeck.services.PlayerService;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +27,11 @@ import java.util.stream.Collectors;
 public class GameController {
 
     private final GameService gameService;
+    private final PlayerService playerService;
 
-    public GameController(GameService gameService) {
+    public GameController(GameService gameService, PlayerService playerService) {
         this.gameService = gameService;
+        this.playerService = playerService;
     }
 
     @PostMapping
@@ -43,51 +46,41 @@ public class GameController {
 
     @GetMapping("/{id}")
     public Game fetchGame(@PathVariable String id) {
-        return gameService
-            .fetchGame(id)
-            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        return gameService.fetchGameOrFail(id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteGame(@PathVariable String id) {
-        gameService
-             .deleteGame(id)
-            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        gameService.deleteGame(id).orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
     }
 
     @PutMapping("/{id}/addDeck")
     public Game addDeck(
         @PathVariable String id,
-        @RequestParam(defaultValue = "1") int nbDecks)
+        @RequestParam(name = "nbDecks", defaultValue = "1") int nbDecks)
     {
         // just ensure we are given a valid number of decks to add.
         // 3 is an upper limit to avoid DoS simple attacks
         if (nbDecks < 1 || nbDecks > 5) {
             throw new IllegalArgumentException("Invalid value for nbDecks");
         }
-
-        return gameService
-            .fetchGame(id)
-            .map(g -> gameService.addDecks(g, nbDecks))
-            .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        final Game game = gameService.fetchGameOrFail(id);
+        gameService.addDecks(game, nbDecks);
+        return game;
     }
 
     // Players related operations
 
     @GetMapping("/{id}/players")
     public Collection<String> getPlayers(@PathVariable String id) {
-        return gameService
-                .fetchGame(id)
-                .map(g -> g.getPlayerMap().keySet())
-                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        final Game game = gameService.fetchGameOrFail(id);
+        return playerService.listPlayers(game).stream().map(Player::getId).collect(Collectors.toList());
     }
 
     @PostMapping("/{id}/players")
     public Player addPlayer(@PathVariable String id) {
-        return gameService
-          .fetchGame(id)
-          .map(gameService::addPlayer)
-          .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        final Game game = gameService.fetchGameOrFail(id);
+        return playerService.addPlayer(game);
     }
 
     @GetMapping("{id}/players/{playerId}")
@@ -95,13 +88,8 @@ public class GameController {
             @PathVariable("id") String id,
             @PathVariable("playerId") String playerId) {
 
-        return gameService
-                .fetchGame(id)
-                .map(g -> gameService
-                        .fetchPlayer(g, playerId)
-                        .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId))
-                )
-                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        final Game game = gameService.fetchGameOrFail(id);
+        return playerService.fetchPlayerOrFail(game, playerId);
     }
 
 
@@ -109,13 +97,9 @@ public class GameController {
     public void removePlayer(
         @PathVariable("id") String id,
         @PathVariable("playerId") String playerId) {
-        gameService
-                .fetchGame(id)
-                .map(g -> gameService
-                        .deletePlayer(g, playerId)
-                        .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId))
-                )
-                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+
+        final Game game = gameService.fetchGameOrFail(id);
+        playerService.deletePlayerOrFail(game, playerId);
     }
 
     @PutMapping("/{id}/players/{playerId}/deal")
@@ -126,10 +110,10 @@ public class GameController {
         if (nbCards <= 0) {
             throw new IllegalArgumentException("Invalid value for nbCards");
         }
-        return gameService
-                .fetchGame(id)
-                .map(g -> gameService.dealCards(g, playerId, nbCards))
-                .orElseThrow(EntityNotFoundExceptionSuppliers.game(id));
+        final Game game = gameService.fetchGameOrFail(id);
+        final Player player = playerService.fetchPlayerOrFail(game, playerId);
+        playerService.dealCards(game, player, nbCards);
+        return player;
     }
 
     // Misc games operations

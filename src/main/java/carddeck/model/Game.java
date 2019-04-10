@@ -13,6 +13,5 @@ public interface Game extends WithId {
     Player removePlayer(String id);
     Player getPlayer(String id);
 
-    void setGameDeck(GameDeck gameDeck);
     GameDeck getGameDeck();
 }

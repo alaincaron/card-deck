@@ -1,10 +1,8 @@
 package carddeck.model;
 
-import carddeck.dao.WithId;
-
 import java.util.Collection;
 
-public interface GameDeck extends WithId {
+public interface GameDeck {
     void reset();
     void init();
     int getNbDecks();

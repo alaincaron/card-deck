@@ -7,9 +7,6 @@ import carddeck.model.GameDeck;
 import carddeck.model.Player;
 import carddeck.model.Score;
 import carddeck.model.Suit;
-import carddeck.rest.EntityNotFoundException;
-import carddeck.rest.EntityNotFoundExceptionSuppliers;
-import carddeck.services.GameDeckService;
 import carddeck.services.GameService;
 import carddeck.services.PlayerService;
 import org.springframework.stereotype.Component;
@@ -27,20 +24,16 @@ import java.util.stream.Collectors;
 class GameServiceImpl implements GameService {
 
     private final GameDAO gameDAO;
-    private final GameDeckService gameDeckService;
     private final PlayerService playerService;
 
-    public GameServiceImpl(GameDAO gameDAO, GameDeckService gameDeckService, PlayerService playerService) {
+    public GameServiceImpl(GameDAO gameDAO, PlayerService playerService) {
         this.gameDAO = gameDAO;
-        this.gameDeckService = gameDeckService;
         this.playerService = playerService;
     }
 
     @Override
     public Game createGame() {
-        final Game game = gameDAO.create();
-        getGameDeck(game);
-        return game;
+        return gameDAO.create();
     }
 
     @Override
@@ -64,46 +57,14 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game addDecks(Game game, int nbDecks) {
-        final GameDeck gameDeck = getGameDeck(game);
+    public void addDecks(Game game, int nbDecks) {
+        final GameDeck gameDeck = game.getGameDeck();
         gameDeck.addDecks(nbDecks, false);
-        return game;
-    }
-
-    @Override
-    public Player addPlayer(Game game) {
-       final Player player = playerService.createPlayer();
-       game.addPlayer(player);
-       return player;
-    }
-
-    @Override
-    public Optional<Player> deletePlayer(Game g, String playerId) {
-        return Optional.ofNullable(g.getPlayerMap().remove(playerId));
-    }
-
-    @Override
-    public Optional<Player> fetchPlayer(Game g, String playerId) {
-        return Optional.ofNullable(g.getPlayerMap().get(playerId));
-    }
-
-    @Override
-    public Player dealCards(Game game, String playerId, int nbCards) {
-        final Player player =
-            playerService
-                .fetch(playerId)
-                .orElseThrow(EntityNotFoundExceptionSuppliers.player(playerId));
-
-        final GameDeck gameDeck = getGameDeck(game);
-        final Collection<Card> cards = gameDeck.dealCards(nbCards);
-        player.getCards().addAll(cards);
-
-        return player;
     }
 
     @Override
     public void shuffle(Game game) {
-        final GameDeck gameDeck = getGameDeck(game);
+        final GameDeck gameDeck = game.getGameDeck();
         gameDeck.shuffle();
     }
 
@@ -119,7 +80,7 @@ class GameServiceImpl implements GameService {
 
     @Override
     public Map<Suit, Integer> getRemainingBySuit(Game game) {
-        final GameDeck gameDeck = getGameDeck(game);
+        final GameDeck gameDeck = game.getGameDeck();
         return gameDeck
             .getRemainingCards()
             .stream()
@@ -132,7 +93,7 @@ class GameServiceImpl implements GameService {
 
     @Override
     public Map<Card, Integer> getRemainingCards(Game game) {
-        final GameDeck gameDeck = getGameDeck(game);
+        final GameDeck gameDeck = game.getGameDeck();
         return gameDeck
             .getRemainingCards()
             .stream()
@@ -153,15 +114,5 @@ class GameServiceImpl implements GameService {
         }
         return card2.getRank().compareTo(card1.getRank());
     };
-
-    private GameDeck getGameDeck(Game game) {
-        GameDeck gameDeck = game.getGameDeck();
-
-        if (gameDeck == null) {
-            gameDeck = gameDeckService.createGameDeck();
-            game.setGameDeck(gameDeck);
-        }
-        return gameDeck;
-    }
 
 }
