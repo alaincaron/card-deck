@@ -14,4 +14,5 @@ public interface Game extends WithId {
     Player getPlayer(String id);
 
     GameDeck getGameDeck();
+    int getNbDecks();
 }

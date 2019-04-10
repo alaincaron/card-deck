@@ -21,7 +21,7 @@ class GameImpl implements Game, Serializable {
     @JsonIgnore
     private final GameDeck gameDeck = new GameDeckImpl();
 
-    public GameImpl(String id) {
+    GameImpl(String id) {
         this.id = id;
     }
 
@@ -55,8 +55,9 @@ class GameImpl implements Game, Serializable {
         return gameDeck;
     }
 
+    @Override
     public int getNbDecks() {
-        return gameDeck == null ? 0 : gameDeck.getNbDecks();
+        return gameDeck.getNbDecks();
     }
 
     @JsonProperty
@@ -65,8 +66,8 @@ class GameImpl implements Game, Serializable {
     }
 
     @JsonProperty
-    public int getNbRemaining() {
-        return gameDeck == null ? 0 : gameDeck.nbRemainingCards();
+    int getNbRemaining() {
+        return gameDeck.nbRemainingCards();
     }
 
 }

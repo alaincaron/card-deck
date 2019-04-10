@@ -56,20 +56,19 @@ class GameDeckImpl implements GameDeck, Serializable {
             new_deck.addAll(Card.newDeck());
         }
         if (shuffled) {
-            shuffle(new_deck);
+            Shuffler.shuffle(new_deck);
         }
         deck.addAll(new_deck);
-
     }
 
     @Override
-    public Collection<Card> getRemainingCards() {
-        return Collections.unmodifiableCollection(deck);
+    public List<Card> getRemainingCards() {
+        return deck;
     }
 
     @Override
     public void shuffle() {
-        shuffle(deck);
+        Shuffler.shuffle(deck);
     }
 
     @Override
@@ -78,35 +77,7 @@ class GameDeckImpl implements GameDeck, Serializable {
     }
 
     @Override
-    public Collection<Card> dealCards(int nbCardsToDeal) {
-        if (nbCardsToDeal <0) {
-            throw new IllegalArgumentException("Invalid number of cards to deal: " + nbCardsToDeal);
-        }
-        if (nbCardsToDeal > deck.size()) {
-            return ImmutableList.of();
-        } else {
-            final Collection<Card> result = Lists.newArrayListWithCapacity(nbCardsToDeal);
-            int idx = deck.size();
-            for (int i = 0; i < nbCardsToDeal; ++i) {
-                result.add(deck.remove(--idx));
-            }
-            return result;
-        }
-    }
-
-    private static void shuffle(List<Card> deck) {
-        if (!(deck instanceof ArrayList<?>)) {
-            throw new IllegalStateException("Passing a non ArrayList to shuffle");
-        }
-
-        final Random r = new SecureRandom();
-        final int n = deck.size();
-        int remaining = n;
-        for (int i = 0; i < n; ++i) {
-            final int pos = i + r.nextInt(remaining--);
-            final Card tmp = deck.get(i);
-            deck.set(i, deck.get(pos));
-            deck.set(pos, tmp);
-        }
+    public List<Card> dealCards(int nbCardsToDeal) {
+        return Dealer.deal(deck, nbCardsToDeal);
     }
 }

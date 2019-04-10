@@ -1,6 +1,7 @@
 package carddeck.model;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface GameDeck {
     void reset();
@@ -9,7 +10,7 @@ public interface GameDeck {
     void addDecks(int nbDecks, boolean shuffled);
     void shuffle();
 
-    Collection<Card> getRemainingCards();
+    List<Card> getRemainingCards();
     int nbRemainingCards();
 
     /**
@@ -17,5 +18,5 @@ public interface GameDeck {
      * @param nbCardsToDeal
      * @return True if the number of remaining cards in deck initially was at least nbCardsToDeal.  False otherwise.
      */
-    Collection<Card> dealCards(int nbCardsToDeal);
+    List<Card> dealCards(int nbCardsToDeal);
 }
