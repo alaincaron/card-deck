@@ -4,16 +4,10 @@ import carddeck.model.Card;
 import carddeck.model.GameDeck;
 import carddeck.model.Rank;
 import carddeck.model.Suit;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.io.Serializable;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 class GameDeckImpl implements GameDeck, Serializable {
     private static final int DECK_SIZE = Suit.values().length * Rank.values().length;

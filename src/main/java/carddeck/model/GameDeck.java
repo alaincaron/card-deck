@@ -15,7 +15,7 @@ public interface GameDeck {
 
     /**
      * Deal specified number of cards. Returns empty list if there are less than nbCardsToDeal remaining in the deck.
-     * @param nbCardsToDeal
+     * @param nbCardsToDeal Number of cards to deal.
      * @return True if the number of remaining cards in deck initially was at least nbCardsToDeal.  False otherwise.
      */
     List<Card> dealCards(int nbCardsToDeal);

@@ -41,7 +41,7 @@ public class Card {
     }
 
     public static List<Card> newDeck() {
-        return new ArrayList<Card>(Arrays.asList(ALL_CARDS));
+        return new ArrayList<>(Arrays.asList(ALL_CARDS));
     }
 
     public String toString() {
