@@ -1,6 +1,5 @@
 package carddeck.impl;
 
-import carddeck.model.Card;
 import com.google.common.collect.Lists;
 
 import java.util.List;

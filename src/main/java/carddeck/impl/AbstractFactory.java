@@ -1,7 +1,8 @@
 package carddeck.impl;
 
 import carddeck.dao.Factory;
-import org.springframework.cglib.core.internal.Function;
+
+import java.util.function.Function;
 
 class AbstractFactory<T> implements Factory<T> {
     private final IdGenerator idGenerator = new IdGenerator();

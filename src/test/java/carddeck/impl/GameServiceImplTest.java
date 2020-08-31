@@ -5,6 +5,7 @@ import carddeck.model.Game;
 import carddeck.model.Player;
 import carddeck.model.Score;
 import carddeck.model.Suit;
+import carddeck.services.GameService;
 import carddeck.services.PlayerService;
 import com.google.common.collect.Maps;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class GameServiceImplTest {
 
     private final GameDAO gameDAO = mock(GameDAO.class);
     private final PlayerService playerService = mock(PlayerService.class);
-    private final GameServiceImpl impl = new GameServiceImpl(gameDAO, playerService);
+    private final GameService impl = new GameServiceImpl(gameDAO, playerService);
 
 
     @Test
@@ -43,7 +44,7 @@ public class GameServiceImplTest {
         doReturn(score2).when(playerService).computeScore(p2);
         doReturn(score3).when(playerService).computeScore(p3);
 
-        List<Score> scores = impl.getScores(game);
+        final List<Score> scores = impl.getScores(game);
         assertEquals(scores, Arrays.asList(score2, score3, score1));
     }
 

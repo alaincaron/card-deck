@@ -26,7 +26,7 @@ class GameServiceImpl implements GameService {
     private final GameDAO gameDAO;
     private final PlayerService playerService;
 
-    public GameServiceImpl(GameDAO gameDAO, PlayerService playerService) {
+    GameServiceImpl(GameDAO gameDAO, PlayerService playerService) {
         this.gameDAO = gameDAO;
         this.playerService = playerService;
     }

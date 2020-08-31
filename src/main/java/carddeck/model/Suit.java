@@ -1,5 +1,5 @@
 package carddeck.model;
 
 public enum Suit {
-    HEARTS, SPADES, CLUBS, DIAMONDS;
+    HEARTS, SPADES, CLUBS, DIAMONDS
 }

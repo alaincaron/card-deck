@@ -2,9 +2,8 @@ package carddeck.rest;
 
 import java.util.function.Supplier;
 
-public class EntityNotFoundExceptionSuppliers {
+public enum EntityNotFoundExceptionSuppliers {
     ;
-
     public static Supplier<EntityNotFoundException> game(String id) {
         return () -> new EntityNotFoundException("Game", id);
     }

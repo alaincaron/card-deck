@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Card {
+public final class Card {
 
     // This class is made immutable with private constructor to ensure identity is same equality
     private final Rank rank;
@@ -41,7 +41,7 @@ public class Card {
     }
 
     public static List<Card> newDeck() {
-        return new ArrayList<Card>(Arrays.asList(ALL_CARDS));
+        return new ArrayList<>(Arrays.asList(ALL_CARDS));
     }
 
     public String toString() {

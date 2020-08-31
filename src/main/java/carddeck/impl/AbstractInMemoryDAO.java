@@ -2,12 +2,12 @@ package carddeck.impl;
 
 import carddeck.dao.GenericDAO;
 import carddeck.dao.WithId;
-import org.springframework.cglib.core.internal.Function;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 class AbstractInMemoryDAO<T extends WithId> extends AbstractFactory<T> implements GenericDAO<T> {
     private final Map<String, T> allInstances = new ConcurrentHashMap<>();
@@ -38,7 +38,6 @@ class AbstractInMemoryDAO<T extends WithId> extends AbstractFactory<T> implement
     @Override
     public Collection<T> list() {
         return allInstances.values();
-
     }
 
     @Override
